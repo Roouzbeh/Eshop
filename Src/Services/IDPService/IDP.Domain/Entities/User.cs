@@ -7,8 +7,11 @@ namespace IDP.Domain.Entities
         //abstract
         public required string FullName { get; set; }
         public required string NationalCode { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public required string UserName { get; set; }
+        public required string Password { get; set; }
+        public required string Salt { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
 
     }
 }

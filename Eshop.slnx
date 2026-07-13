@@ -1,7 +1,10 @@
 <Solution>
   <Folder Name="/Src/" />
-  <Folder Name="/Src/Common/" />
+  <Folder Name="/Src/Common/">
+    <Project Path="Src/Common/Auth/Auth.csproj" Id="09d044bc-0b83-4c9c-892a-b864bdb111f7" />
+  </Folder>
   <Folder Name="/Src/Services/" />
+  <Folder Name="/Src/Services/ApiGetway/" />
   <Folder Name="/Src/Services/BascketService/" />
   <Folder Name="/Src/Services/CatalogService/" />
   <Folder Name="/Src/Services/IDPService/">
