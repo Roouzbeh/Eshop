@@ -27,7 +27,7 @@ namespace Auth
             };
         }
 
-        public JsonWebToken Create(Guid userId)
+        public JsonWebToken Create(long userId)
         {
             var nowUtc = DateTime.UtcNow;
             var expires = nowUtc.AddMinutes(_options.ExpiryMinutes);
