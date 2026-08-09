@@ -1,10 +1,16 @@
 using Asp.Versioning;
 using IDP.Application.Handlers.Command.User;
 using IDP.Domain.IRepositories.Commands;
+using IDP.Domain.IRepositories.Commands.Base;
+using IDP.Domain.IRepositories.Queries;
+using IDP.Infra.Data;
 using IDP.Infra.Repositories.Commands;
+using IDP.Infra.Repositories.Commands.Base;
+using IDP.Infra.Repositories.Queries;
+using Mapster;
 using MediatR;
-using System.Reflection;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +28,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(UserHandler).GetTypeInfo().Assembly);
 builder.Services.AddScoped<IOtpRedisRepository,OtpRedisRepository>();
+builder.Services.AddScoped<IUserCommandRepository, UserCommandRepository>();
+builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
+builder.Services.AddScoped(typeof(ICommandRepository<>), typeof(CommandRepository<>));
+builder.Services.AddTransient<ShopCommandDbContext>();
+builder.Services.AddTransient<ShopQueryDbContext>();
+builder.Services.AddMapster();
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1);

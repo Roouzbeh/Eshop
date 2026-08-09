@@ -11,7 +11,7 @@ namespace IDP.Domain.Entities
         public required string Password { get; set; }
         public required string Salt { get; set; }
         public string? Email { get; set; }
-        public string? PhoneNumber { get; set; }
+        public required string MobileNumber { get; set; }
 
     }
 }
