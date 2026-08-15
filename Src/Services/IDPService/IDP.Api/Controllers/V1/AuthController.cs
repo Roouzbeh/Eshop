@@ -2,7 +2,6 @@
 using IDP.Application.Commands.Auth;
 using IDP.Application.Queries.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IDP.Api.Controllers.V1
