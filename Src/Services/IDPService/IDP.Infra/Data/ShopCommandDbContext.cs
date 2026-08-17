@@ -14,10 +14,10 @@ namespace IDP.Infra.Data
         }
         public DbSet<User>  Users { get; set; }
         public DbSet<Outbox>  Outbox { get; set; }
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-        //}
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
 
     }
 }

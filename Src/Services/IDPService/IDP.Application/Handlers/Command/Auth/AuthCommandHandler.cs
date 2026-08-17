@@ -1,4 +1,5 @@
-﻿using IDP.Application.Commands.Auth;
+﻿using DotNetCore.CAP;
+using IDP.Application.Commands.Auth;
 using IDP.Domain.IRepositories.Commands;
 using IDP.Domain.IRepositories.Queries;
 using MapsterMapper;
@@ -9,7 +10,8 @@ namespace IDP.Application.Handlers.Command.Auth
     public class AuthCommandHandler(IOtpRedisRepository _otpRedisRepository,
         IUserCommandRepository _userCommandRepository,
         IUserQueryRepository _userQueryRepository,
-        IMapper _mapper) : IRequestHandler<AuthCommand, bool>
+        IMapper _mapper,
+        ICapPublisher _capBus) : IRequestHandler<AuthCommand, bool>
     {
         public async Task<bool> Handle(AuthCommand request, CancellationToken cancellationToken)
         {
@@ -22,7 +24,7 @@ namespace IDP.Application.Handlers.Command.Auth
                     Random random = new Random();
                     var code = random.Next(1000, 10000);
                     //send sms to notif service
-
+                    await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber=request.MobileNumber });
                     userObj.UserName = request.MobileNumber;
                     var res = await _userCommandRepository.Insert(userObj);
                     await _otpRedisRepository.Insert(new Domain.DTO.OTP { UserName = userObj.MobileNumber, OtpCode = code, IsUse = false });
@@ -32,6 +34,7 @@ namespace IDP.Application.Handlers.Command.Auth
                     Random random = new Random();
                     var code = random.Next(1000, 10000);
                     //send sms to notif service
+                    await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber = request.MobileNumber });
 
                     userObj.UserName = request.MobileNumber;
                     await _otpRedisRepository.Insert(new Domain.DTO.OTP { UserName = user.MobileNumber, OtpCode = code, IsUse = false });

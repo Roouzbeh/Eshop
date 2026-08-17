@@ -17,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 #region redisConfig
 builder.Services.AddStackExchangeRedisCache(options =>
-{ 
+{
     options.Configuration = builder.Configuration.GetValue<string>("CacheSetting:RedisUrl");
 }
 );
@@ -27,7 +27,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(UserHandler).GetTypeInfo().Assembly);
-builder.Services.AddScoped<IOtpRedisRepository,OtpRedisRepository>();
+builder.Services.AddScoped<IOtpRedisRepository, OtpRedisRepository>();
 builder.Services.AddScoped<IUserCommandRepository, UserCommandRepository>();
 builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
 builder.Services.AddScoped(typeof(ICommandRepository<>), typeof(CommandRepository<>));
@@ -49,7 +49,25 @@ builder.Services.AddApiVersioning(options =>
     options.GroupNameFormat = "'v'V";
     options.SubstituteApiVersionInUrl = true;
 });
-Auth.Extensions.AddJwt(builder.Services,builder.Configuration);
+builder.Services.AddCap(options =>
+{
+    options.UseEntityFramework<ShopCommandDbContext>();
+    options.UseDashboard(path => path.PathMatch = "/cap");
+    options.UseRabbitMQ(options =>
+    {
+        options.ConnectionFactoryOptions = options =>
+        {
+            options.Ssl.Enabled = false;
+            options.HostName = "localhost";
+            options.UserName = "guest";
+            options.Password = "guest";
+            options.Port = 5672;
+        };
+    });
+    options.FailedRetryCount = 10;
+    options.FailedRetryInterval = 5; //second
+});
+Auth.Extensions.AddJwt(builder.Services, builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
