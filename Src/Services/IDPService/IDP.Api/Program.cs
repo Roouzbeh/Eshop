@@ -1,73 +1,12 @@
-using Asp.Versioning;
-using IDP.Application.Handlers.Command.User;
-using IDP.Domain.IRepositories.Commands;
-using IDP.Domain.IRepositories.Commands.Base;
-using IDP.Domain.IRepositories.Queries;
-using IDP.Infra.Data;
-using IDP.Infra.Repositories.Commands;
-using IDP.Infra.Repositories.Commands.Base;
-using IDP.Infra.Repositories.Queries;
-using Mapster;
-using MediatR;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-using System.Reflection;
-
+using IDP.Ioc;
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-#region redisConfig
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetValue<string>("CacheSetting:RedisUrl");
-}
-);
-#endregion
-builder.Services.AddControllers();
+ 
+builder.Services.AddControllers();//
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddMediatR(typeof(UserHandler).GetTypeInfo().Assembly);
-builder.Services.AddScoped<IOtpRedisRepository, OtpRedisRepository>();
-builder.Services.AddScoped<IUserCommandRepository, UserCommandRepository>();
-builder.Services.AddScoped<IUserQueryRepository, UserQueryRepository>();
-builder.Services.AddScoped(typeof(ICommandRepository<>), typeof(CommandRepository<>));
-builder.Services.AddTransient<ShopCommandDbContext>();
-builder.Services.AddTransient<ShopQueryDbContext>();
-builder.Services.AddMapster();
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1);
-    options.ReportApiVersions = true;
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ApiVersionReader = ApiVersionReader.Combine(
-        new UrlSegmentApiVersionReader(),
-        new HeaderApiVersionReader("X-Api-Version"));
-}).AddMvc() // This is needed for controllers
+builder.Services.AddEndpointsApiExplorer();//
+builder.Services.AddSwaggerGen();// 
+builder.RegisterService();
 
-.AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'V";
-    options.SubstituteApiVersionInUrl = true;
-});
-builder.Services.AddCap(options =>
-{
-    options.UseEntityFramework<ShopCommandDbContext>();
-    options.UseDashboard(path => path.PathMatch = "/cap");
-    options.UseRabbitMQ(options =>
-    {
-        options.ConnectionFactoryOptions = options =>
-        {
-            options.Ssl.Enabled = false;
-            options.HostName = "localhost";
-            options.UserName = "guest";
-            options.Password = "guest";
-            options.Port = 5672;
-        };
-    });
-    options.FailedRetryCount = 10;
-    options.FailedRetryInterval = 5; //second
-});
-Auth.Extensions.AddJwt(builder.Services, builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

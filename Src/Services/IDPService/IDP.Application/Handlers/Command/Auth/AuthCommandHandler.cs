@@ -1,8 +1,10 @@
 ﻿using DotNetCore.CAP;
+using EventMessages.Events;
 using IDP.Application.Commands.Auth;
 using IDP.Domain.IRepositories.Commands;
 using IDP.Domain.IRepositories.Queries;
 using MapsterMapper;
+using MassTransit;
 using MediatR;
 
 namespace IDP.Application.Handlers.Command.Auth
@@ -11,11 +13,12 @@ namespace IDP.Application.Handlers.Command.Auth
         IUserCommandRepository _userCommandRepository,
         IUserQueryRepository _userQueryRepository,
         IMapper _mapper,
-        ICapPublisher _capBus) : IRequestHandler<AuthCommand, bool>
+        //  ICapPublisher _capBus,
+        IPublishEndpoint _publishEndpoint) : IRequestHandler<AuthCommand, bool>
     {
         public async Task<bool> Handle(AuthCommand request, CancellationToken cancellationToken)
         {
-            try 
+            try
             {
                 var userObj = _mapper.Map<IDP.Domain.Entities.User>(request);
                 var user = await _userQueryRepository.GetUserAsync(request.MobileNumber);
@@ -24,7 +27,12 @@ namespace IDP.Application.Handlers.Command.Auth
                     Random random = new Random();
                     var code = random.Next(1000, 10000);
                     //send sms to notif service
-                    await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber=request.MobileNumber });
+                    await _publishEndpoint.Publish<OtpEvent>(new OtpEvent
+                    {
+                        MobileNumber = request.MobileNumber,
+                        OtpCode = code.ToString(),
+                    });
+                    // for cap // await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber=request.MobileNumber });
                     userObj.UserName = request.MobileNumber;
                     var res = await _userCommandRepository.Insert(userObj);
                     await _otpRedisRepository.Insert(new Domain.DTO.OTP { UserName = userObj.MobileNumber, OtpCode = code, IsUse = false });
@@ -34,7 +42,13 @@ namespace IDP.Application.Handlers.Command.Auth
                     Random random = new Random();
                     var code = random.Next(1000, 10000);
                     //send sms to notif service
-                    await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber = request.MobileNumber });
+                    //for cap  await _capBus.PublishAsync<AuthCommand>("otpevent", new AuthCommand { MobileNumber = request.MobileNumber });
+
+                    await _publishEndpoint.Publish<OtpEvent>(new OtpEvent
+                    {
+                        MobileNumber = request.MobileNumber,
+                        OtpCode = code.ToString(),
+                    });
 
                     userObj.UserName = request.MobileNumber;
                     await _otpRedisRepository.Insert(new Domain.DTO.OTP { UserName = user.MobileNumber, OtpCode = code, IsUse = false });
@@ -42,12 +56,12 @@ namespace IDP.Application.Handlers.Command.Auth
                 }
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-            
+
             }
 
-             return true;
+            return true;
         }
     }
 }

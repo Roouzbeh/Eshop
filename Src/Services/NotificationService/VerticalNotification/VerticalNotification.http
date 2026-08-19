@@ -1,0 +1,6 @@
+@VerticalNotification_HostAddress = http://localhost:5062
+
+GET {{VerticalNotification_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

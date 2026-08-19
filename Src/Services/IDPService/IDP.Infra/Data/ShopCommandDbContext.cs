@@ -1,4 +1,5 @@
 ﻿using IDP.Domain.Entities;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,10 +14,14 @@ namespace IDP.Infra.Data
             options.UseSqlServer(_configuration.GetConnectionString("CommandDBConnection"));
         }
         public DbSet<User>  Users { get; set; }
-        public DbSet<Outbox>  Outbox { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // این سه خط برای جدول‌های Outbox لازمه
+            modelBuilder.AddInboxStateEntity();
+            modelBuilder.AddOutboxMessageEntity();
+            modelBuilder.AddOutboxStateEntity();
+
         }
 
     }
