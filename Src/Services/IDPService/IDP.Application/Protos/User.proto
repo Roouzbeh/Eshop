@@ -1,0 +1,20 @@
+﻿// user.proto
+syntax = "proto3";
+
+option csharp_namespace = "UserService.Grpc"; // what ever you want the namespace to be
+
+package user; // what ever you want the package to be (class)
+
+service UserGrpc {
+  rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse);
+}// The request message containing the user's id (override method that you want)(GetUserById is name of method)
+
+message GetUserByIdRequest {
+  int32 id = 1; // The user's id (numbers is binary)
+}//initial
+
+message GetUserByIdResponse {
+  string id = 1; // The user's id (numbers is binary)
+  string name = 2; // The user's name (numbers is binary)
+  string email = 3; // The user's email (numbers is binary) max 15
+}//return

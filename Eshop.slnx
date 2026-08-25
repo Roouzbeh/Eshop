@@ -21,7 +21,9 @@
   <Folder Name="/Src/Services/NotificationService/">
     <Project Path="Src/Services/NotificationService/VerticalNotification/VerticalNotification.csproj" Id="920d6394-7b8b-469f-b716-beebee1245b5" />
   </Folder>
-  <Folder Name="/Src/Services/OrderService/" />
+  <Folder Name="/Src/Services/OrderService/">
+    <Project Path="Src/Services/OrderService/OrderService/OrderService.csproj" Id="b2e3465f-f9c4-4eb6-914c-36c88c551216" />
+  </Folder>
   <Folder Name="/Src/Services/ReportService/" />
   <Folder Name="/Src/Services/SearchService/" />
 </Solution>
